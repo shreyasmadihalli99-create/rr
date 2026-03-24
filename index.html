@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Raghavendra Vaibhav - Menu</title>
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --accent: #ff9800;
+            --bg: #fffbf5;
+            --text: #333;
+            --white: #ffffff;
+            --gray: #f4f4f4;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        #hero-page {
+            height: 100vh;
+            width: 100%;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: 80% center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 3000;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #hero-page.hidden { transform: translateY(-100%); }
+
+        .explore-btn {
+            margin-top: 25px;
+            background: var(--accent);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+
+        #menu-page {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            padding-bottom: 450px; /* Increased to fit new inputs */
+        }
+
+        .tabs-container {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            display: flex;
+            overflow-x: auto;
+            padding: 15px;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            scrollbar-width: none;
+        }
+        .tabs-container::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            background: var(--gray);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .category-img-wrapper {
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .category-banner {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 15px;
+            background-color: #eee;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .menu-section { padding: 0 15px; }
+        .category-header {
+            color: var(--primary);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .item-name { font-weight: 700; flex: 2; font-size: 0.95rem; }
+        .price-align { font-weight: bold; color: var(--primary); margin-right: 15px; }
+
+        .qty-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gray);
+            padding: 5px 8px;
+            border-radius: 20px;
+        }
+        .qty-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* UPDATED CART POPUP */
+        .cart-popup {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 100%;
+            max-width: 500px;
+            background: var(--white);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            padding: 20px;
+            transition: transform 0.4s ease;
+            z-index: 4000;
+            box-sizing: border-box;
+        }
+        .cart-popup.active { transform: translateX(-50%) translateY(0); }
+
+        /* NEW INPUT STYLING */
+        .delivery-input {
+            width: 100%; padding: 12px; margin-bottom: 10px; 
+            border: 1.5px solid #eee; border-radius: 10px;
+            font-size: 1rem; box-sizing: border-box; outline: none;
+        }
+        .delivery-input:focus { border-color: var(--accent); }
+
+        .loc-btn {
+            background: #2196F3; color: white; border: none; padding: 12px;
+            width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px;
+        }
+        .loc-btn.verified { background: #2e7d32; }
+
+        .checkout-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: none; /* Hidden until GPS is shared */
+        }
+
+        .fee-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <section id="hero-page">
+        <h1 style="font-size: 2.5rem; margin-bottom: 0;">Hotel Raghavendra Vaibhav</h1>
+        <p style="font-size: 1.2rem; margin-top: 10px;">Authentic Udupi Taste</p>
+        <button class="explore-btn" onclick="openMenu()">Explore Menu</button>
+    </section>
+
+    <main id="menu-page">
+        <div class="tabs-container" id="tabs"></div>
+
+        <div class="category-img-wrapper">
+            <img id="category-image" class="category-banner" src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80" alt="Category Banner">
+        </div>
+
+        <div class="menu-section">
+            <h2 id="current-category-name" class="category-header">Drinks & Breakfast</h2>
+            <div id="menu-items-container"></div>
+        </div>
+
+        <div class="cart-popup" id="cart-popup">
+            <div style="font-weight:bold; border-bottom:1px solid #ddd; padding-bottom:10px; margin-bottom: 10px;">Delivery Details</div>
+            
+            <input type="text" id="cust-name" class="delivery-input" placeholder="Full Name (Letters Only)" 
+                   oninput="this.value = this.value.replace(/[0-9]/g, '')">
+            
+            <input type="tel" id="cust-phone" class="delivery-input" placeholder="10-Digit Mobile Number" 
+                   maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+
+            <button class="loc-btn" id="loc-btn" onclick="getLocation()">📍 Share Live Location (Required)</button>
+
+            <div id="cart-items-container" style="max-height: 15vh; overflow-y: auto; margin-bottom: 10px;"></div>
+            
+            <div id="fees-container" style="border-top: 1px dashed #ccc; padding-top: 10px; margin-bottom: 10px;">
+                <div class="fee-row"><span>Convenience Fee</span><span>₹5</span></div>
+                <div class="fee-row"><span>Delivery Charge</span><span>₹10</span></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--primary); font-size:1.3rem; margin-bottom: 10px;">
+                <span>Total Amount</span>
+                <span>₹<span id="cart-grand-total">0</span></span>
+            </div>
+            
+            <button id="whatsapp-btn" class="checkout-btn" onclick="checkoutWhatsApp()">Order via WhatsApp</button>
+        </div>
+    </main>
+
+<script>
+    // YOUR GOOGLE SCRIPT URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJgGcutCXXsOnih_Ny1okXEEJOJOPNlTx7kXryK4nXr5Slhc443TbG5ONkczEUKQht/exec";
+    
+    let userLocationURL = "";
+
+    function openMenu() {
+        document.getElementById('hero-page').classList.add('hidden');
+        setTimeout(() => {
+            document.getElementById('hero-page').style.display = 'none';
+            document.getElementById('menu-page').style.display = 'block';
+            window.scrollTo(0, 0);
+        }, 600);
+    }
+
+    // EXACT MENU DATA FROM YOUR CODE
+    const menu = {
+        "Drinks & Breakfast": [
+            {name: "Tea", price: 15}, {name: "Coffee", price: 25}, {name: "KT", price: 25},
+            {name: "Bournvita", price: 25}, {name: "Milk", price: 20}, {name: "Majjige", price: 25},
+            {name: "Uppitu (Upma)", price: 25}, {name: "Kesari Bath (Sheera)", price: 25},
+            {name: "Idli", price: 35}, {name: "Vada", price: 50}, {name: "Idli Vada", price: 60},
+            {name: "Rava Idli (Single)", price: 30}, {name: "Rava Idli (Full)", price: 50},
+            {name: "Puri (Single)", price: 35}, {name: "Puri (Full)", price: 60},
+            {name: "Palav (Single)", price: 35}, {name: "Palav (Full)", price: 55},
+            {name: "Masala Dosa", price: 60}, {name: "Cut Masala", price: 65}, {name: "Plain Dosa", price: 50},
+            {name: "Set Dosa (Single)", price: 40}, {name: "Set Dosa (Full)", price: 60},
+            {name: "Sada Dosa (Single)", price: 35}, {name: "Sada Dosa (Full)", price: 55},
+            {name: "Uttappa", price: 60}, {name: "Cut Uttappa", price: 65}, {name: "Tomato Omelet", price: 60},
+            {name: "Spl Dosa", price: 80}, {name: "Shavige Uppit", price: 30},
+            {name: "Bajji / Pakoda (Single)", price: 20}, {name: "Bajji / Pakoda (Full)", price: 35},
+            {name: "Gulab Jamoon (Single)", price: 20}, {name: "Gulab Jamoon (Full)", price: 50},
+            {name: "Pav Bhaji", price: 50}, {name: "Misal Pav", price: 50}, {name: "Aloo Bonda", price: 35},
+            {name: "Rice Samber", price: 50}
+        ],
+        "Soups & Starters": [
+            {name: "Tomato Soup", price: 80}, {name: "Veg Manchow Soup", price: 100},
+            {name: "Veg Hot & Sour Soup", price: 90}, {name: "Veg Clear Soup", price: 90},
+            {name: "Green Salad", price: 50}, {name: "Gobi Manchurian", price: 80},
+            {name: "Gobi Chilli", price: 100}, {name: "Gobi - 65", price: 110},
+            {name: "Paneer Manchurian", price: 150}, {name: "Paneer Chilli", price: 150},
+            {name: "Paneer - 65", price: 130}, {name: "Paneer Pepper Dry", price: 140},
+            {name: "Paneer Pakoda", price: 150}, {name: "Paneer Satay", price: 150},
+            {name: "Veg Manchurian", price: 110}, {name: "Veg Chilli", price: 120},
+            {name: "Mushroom Manchurian", price: 150}, {name: "Mushroom Chilli", price: 150},
+            {name: "Mushroom Pepper Dry", price: 140}, {name: "Finger Chips", price: 80},
+            {name: "Harbara Kebab", price: 140}, {name: "Aloo Jeera", price: 100}
+        ],
+        "Veg Main Course": [
+            {name: "Dal Fry", price: 90}, {name: "Dal Tadka", price: 100}, {name: "Dal Kolhapuri", price: 100},
+            {name: "Dal Palak", price: 110}, {name: "Mix Veg", price: 120}, {name: "Veg Kolhapuri", price: 130},
+            {name: "Veg Hydrabadi", price: 140}, {name: "Veg Makhanwala", price: 140}, {name: "Veg Kadai", price: 150},
+            {name: "Veg Bhuna Masala", price: 150}, {name: "Veg Maratha", price: 160}, {name: "Veg Handi", price: 160},
+            {name: "Veg Malvani", price: 170}, {name: "Veg Diwani Handi", price: 200}, {name: "Palak Mutter", price: 120},
+            {name: "Aloo Mutter", price: 120}, {name: "Aloo Gobi", price: 120}, {name: "Green Peas Masala", price: 110},
+            {name: "Plain Palak", price: 100}, {name: "Akka Masoor", price: 100}, {name: "Chana Masala", price: 110},
+            {name: "Baingan Masala", price: 100}, {name: "Bhindi Masala", price: 100}, {name: "Capsicum Masala", price: 110},
+            {name: "Veg Jaipuri", price: 140}, {name: "Veg Patiala", price: 130}, {name: "Shev Bhaji", price: 130}
+        ],
+        "Paneer & Special": [
+            {name: "Palak Paneer", price: 140}, {name: "Paneer Masala", price: 140},
+            {name: "Paneer Shahi Kurma", price: 180}, {name: "Paneer Hydrabadi", price: 180},
+            {name: "Paneer Tikka Masala", price: 170}, {name: "Paneer Butter Masala", price: 170},
+            {name: "Paneer Kadai", price: 170}, {name: "Paneer Kurma (Sweet)", price: 170},
+            {name: "Paneer Pasanda", price: 180}, {name: "Paneer Basket", price: 190},
+            {name: "Mushroom Masala", price: 150}, {name: "Mushroom Kadai", price: 160},
+            {name: "Veg Kofta", price: 150}, {name: "Malai Kofta", price: 200}, {name: "Paneer Kofta", price: 180},
+            {name: "Kaju Masala", price: 190}, {name: "Kaju Paneer Masala", price: 220}, {name: "Kaju Kadai", price: 200},
+            {name: "Kaju Makhanwala", price: 200}, {name: "Kaju Kolhapuri", price: 200}, {name: "Kaju Kurma (Sweet)", price: 200}
+        ],
+        "Breads & Papad": [
+            {name: "Rosted Papad", price: 20}, {name: "Fry Papad", price: 25}, {name: "Masala Papad", price: 40},
+            {name: "Roti", price: 20}, {name: "Butter Roti", price: 25}, {name: "Naan", price: 40},
+            {name: "Butter Naan", price: 50}, {name: "Kulcha", price: 35}, {name: "Butter Kulcha", price: 40},
+            {name: "Parotta", price: 35}, {name: "Butter Parotta", price: 40}, {name: "Aloo Paratha", price: 80},
+            {name: "Paneer Paratha", price: 100}, {name: "Veg Paratha", price: 80}, {name: "Onion Paratha", price: 80},
+            {name: "Garlic Naan", price: 60}
+        ],
+        "Rice & Meals": [
+            {name: "Plain Rice (Full)", price: 70}, {name: "Jeera Rice (Full)", price: 100},
+            {name: "Masala Rice (Full)", price: 110}, {name: "Ghee Rice (Full)", price: 140},
+            {name: "Curd Rice (Full)", price: 130}, {name: "Veg Fried Rice (Full)", price: 120},
+            {name: "Schezwan Fried Rice (Full)", price: 150}, {name: "Veg Biryani (Full)", price: 160},
+            {name: "Veg Noodles", price: 130}, {name: "Dal Kichadi", price: 130},
+            {name: "Meals", price: 90}, {name: "Roti Meals", price: 100}
+        ]
+    };
+
+    const categoryImages = {
+        "Drinks & Breakfast": "tea breakfast .png",
+        "Soups & Starters": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80",
+        "Veg Main Course": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+        "Paneer & Special": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80",
+        "Breads & Papad": "https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?auto=format&fit=crop&w=800&q=80",
+        "Rice & Meals": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80"
+    };
+
+    let cart = {};
+    const CONVENIENCE_FEE = 5;
+    const DELIVERY_CHARGE = 10;
+
+    function renderTabs() {
+        const container = document.getElementById('tabs');
+        Object.keys(menu).forEach((cat, index) => {
+            const btn = document.createElement('button');
+            btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+            btn.innerText = cat;
+            btn.onclick = () => switchCategory(cat, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function switchCategory(cat, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('current-category-name').innerText = cat;
+        document.getElementById('category-image').src = categoryImages[cat];
+        renderItems(cat);
+    }
+
+    function renderItems(cat) {
+        const container = document.getElementById('menu-items-container');
+        container.innerHTML = '';
+        menu[cat].forEach(item => {
+            const currentQty = cart[item.name] ? cart[item.name].qty : 0;
+            const cleanId = item.name.replace(/[^a-zA-Z0-9]/g, ''); 
+            const div = document.createElement('div');
+            div.className = 'menu-item';
+            div.innerHTML = `
+                <div class="item-name">${item.name}</div>
+                <div class="price-align">₹${item.price}</div>
+                <div class="qty-box">
+                    <button class="qty-btn" onclick="updateCart('${item.name}', ${item.price}, -1)">-</button>
+                    <span id="qty-${cleanId}">${currentQty}</span>
+                    <button class="qty-btn" onclick="updateCart('${item.name}', ${item.price}, 1)">+</button>
+                </div>`;
+            container.appendChild(div);
+        });
+    }
+
+    function updateCart(name, price, change) {
+        if(!cart[name]) cart[name] = {qty: 0, price: price};
+        if (cart[name].qty === 0 && change === -1) return;
+        cart[name].qty += change;
+        const cleanId = name.replace(/[^a-zA-Z0-9]/g, '');
+        const el = document.getElementById(`qty-${cleanId}`);
+        if(el) el.innerText = cart[name].qty;
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let itemsSubtotal = 0; let cartHTML = ''; let count = 0;
+        for (let key in cart) {
+            if (cart[key].qty > 0) {
+                count++;
+                let itemTotal = cart[key].qty * cart[key].price;
+                itemsSubtotal += itemTotal;
+                cartHTML += `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size: 0.95rem;">
+                        <span>${key} x ${cart[key].qty}</span>
+                        <span>₹${itemTotal}</span>
+                    </div>`;
+            }
+        }
+        const popup = document.getElementById('cart-popup');
+        if (count > 0) {
+            document.getElementById('cart-items-container').innerHTML = cartHTML;
+            document.getElementById('cart-grand-total').innerText = itemsSubtotal + CONVENIENCE_FEE + DELIVERY_CHARGE;
+            popup.classList.add('active');
+        } else {
+            popup.classList.remove('active');
+        }
+    }
+
+    // --- NEW GPS FEATURE ---
+    function getLocation() {
+        const btn = document.getElementById('loc-btn');
+        if (navigator.geolocation) {
+            btn.innerText = "🛰️ Locating House...";
+            navigator.geolocation.getCurrentPosition((pos) => {
+                userLocationURL = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                btn.innerText = "✅ Location Locked";
+                btn.classList.add('verified');
+                document.getElementById('whatsapp-btn').style.display = 'block';
+            }, () => {
+                alert("Please enable GPS/Location access.");
+                btn.innerText = "❌ GPS Error";
+            }, {enableHighAccuracy: true});
+        }
+    }
+
+    function checkoutWhatsApp() {
+        const name = document.getElementById('cust-name').value.trim();
+        const phone = document.getElementById('cust-phone').value.trim();
+        
+        if(name.length < 2) return alert("Please enter your name.");
+        if(phone.length !== 10) return alert("Please enter 10-digit phone number.");
+
+        let itemsSubtotal = 0;
+        let orderSummary = "";
+        let msg = "*Order from Hotel Raghavendra Vaibhav*\n\n";
+        msg += `*Customer:* ${name}\n*Phone:* ${phone}\n\n*Items:*\n`;
+
+        for (let key in cart) { 
+            if (cart[key].qty > 0) {
+                let itemTotal = cart[key].qty * cart[key].price;
+                itemsSubtotal += itemTotal;
+                msg += `• ${key} x ${cart[key].qty} (₹${itemTotal})\n`;
+                orderSummary += `${key}(${cart[key].qty}), `;
+            }
+        }
+        
+        const grandTotal = itemsSubtotal + CONVENIENCE_FEE + DELIVERY_CHARGE;
+        msg += `\n*Grand Total: ₹${grandTotal}*`;
+        msg += `\n\n📍 *Live Location:* ${userLocationURL}`;
+        
+        // Background Send to Google Sheets
+        const payload = {
+            hotel: "Raghavendra Vaibhav",
+            customerName: name,
+            phone: phone,
+            order: orderSummary.slice(0, -2),
+            total: grandTotal,
+            location: userLocationURL
+        };
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+
+        // WhatsApp Redirect
+        window.open(`https://wa.me/917899196669?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    renderTabs();
+    renderItems("Drinks & Breakfast");
+</script>
+
+</body>
+</html>
